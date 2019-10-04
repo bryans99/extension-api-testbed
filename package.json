@@ -1,15 +1,19 @@
 {
-  "name": "extension-template",
+  "name": "extension-api-testbed",
   "version": "0.1.0",
   "description": "",
   "scripts": {
-    "start": "parcel dev.html",
-    "build": "parcel build src/index.tsx"
+    "start": "parcel dev.html --https --no-hmr",
+    "build": "parcel build src/index.tsx",
+    "install": "cp dist/index.js ~/looker/helltool/looker/models-user-1/bryn_extension_core_api/core_api_test.js"
   },
   "license": "MIT",
   "dependencies": {
+    "@looker/chatty": "^2.2.0",
+    "@looker/sdk": "^0.1.3-beta.4",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
+    "looker-lens": "^0.0.1-beta.25",
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
   },
@@ -38,5 +42,8 @@
         }
       ]
     ]
+  },
+  "engines": {
+    "node": ">=10"
   }
 }

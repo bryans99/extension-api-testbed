@@ -3,3 +3,5 @@ dist
 !dist/index.js
 .cache
 .vscode
+yarn-error.log
+.npmrc
