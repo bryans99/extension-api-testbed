@@ -35,24 +35,19 @@ export class ExtensionSession implements IAuthorizer {
   sudoId: string = ""
   transport: ITransport
 
-  constructor(public settings: IApiSettings, transport?: ITransport) {
+  constructor(public settings: IApiSettings, transport: ITransport) {
     this.settings = settings
-    this.transport = transport || new ExtensionTransport(settings)
+    this.transport = transport
   }
 
-  // Determines if the authentication token exists and has not expired
   isAuthenticated() {
-    // const token = this.activeToken
-    // if (!token) return false
-    return false
+    // Assume if the extensions exists then it is authenticated
+    return true
   }
 
   async authenticate(init: IRequestInit) {
-    // const token = this.activeToken
-    // if (token) init.headers["X-CSRF-TOKEN"] = token
-    // return init
     return new Promise<IRequestInit>((resolve, reject) => {
-      reject("Not implemented")
+      reject("Authenticate not supported from ExtensionSession")
     })
   }
 

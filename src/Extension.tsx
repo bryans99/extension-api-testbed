@@ -3,16 +3,11 @@ import { Chatty } from "@looker/chatty"
 import { LookerExtensionSDK } from "./looker/rtl/extensionSdk"
 import { createExtensionHost } from "./extension/api/extension_host_api"
 import { ExtensionHostApi } from "./extension/api/types"
+import { LookerSDK } from "@looker/sdk"
 
 let lang: string = "TypeScript"
 
-enum Actions {
-  INVOKE_CORE_SDK = "INVOKE_CORE_SDK",
-  INVOKE_EXTENSION_API = "INVOKE_EXTENSION_API"
-}
-
 export default () => {
-  const [host, setHost] = React.useState()
   const [extensionHost, setExtensionHost] = React.useState<ExtensionHostApi>()
   const [messages, setMessages] = React.useState("")
   React.useEffect(() => {
@@ -22,7 +17,6 @@ export default () => {
       .connect()
       .then(_host => {
         setExtensionHost(createExtensionHost(_host))
-        setHost(_host)
       })
       .catch(console.error)
   }, [])
@@ -63,7 +57,7 @@ export default () => {
   const getConnectionsButtonClick = () => {
     if (extensionHost) {
       extensionHost
-        .invokeCoreSdk("all_connections")
+        .invokeCoreSdkByName("all_connections")
         .then(response => {
           if (response.ok) {
             let message = ""
@@ -84,22 +78,21 @@ export default () => {
   }
 
   const getConnectionsUsingExtensionsSdkButtonClick = () => {
-    // if (host) {
-    //   host
-    //     .sendAndReceive("core_api", { method: "all_connections" })
-    //     .then((response: any) => {
-    //       if (response.ok) {
-    //         let message = ""
-    //         response.value.forEach(connection => {
-    //           message += connection.name + "\n"
-    //         })
-    //         setMessages(messages + "\n" + message)
-    //       }
-    //     })
-    // } else {
-    //   setMessages(messages + "\nWhere's my host?")
-    //   console.error("Where's my host?")
-    // }
+    if (extensionHost) {
+      const sdk = LookerExtensionSDK.createClient(extensionHost)
+      sdk.all_connections().then((response: any) => {
+        if (response.ok) {
+          let message = ""
+          response.value.forEach(connection => {
+            message += connection.name + "\n"
+          })
+          setMessages(messages + "\n" + message)
+        }
+      })
+    } else {
+      setMessages(messages + "\nWhere's my host?")
+      console.error("Where's my host?")
+    }
   }
 
   return (
