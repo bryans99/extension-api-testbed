@@ -1,9 +1,10 @@
 import * as React from "react"
 import { Chatty } from "@looker/chatty"
-import { LookerExtensionSDK } from "./looker/rtl/extensionSdk"
-import { createExtensionHost } from "./extension/api/extension_host_api"
-import { ExtensionHostApi } from "./extension/api/types"
-import { LookerSDK } from "@looker/sdk"
+import {
+  createExtensionHost,
+  LookerExtensionSDK,
+  ExtensionHostApi
+} from "./extension/api"
 
 let lang: string = "TypeScript"
 
