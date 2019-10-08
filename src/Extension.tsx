@@ -46,11 +46,6 @@ export default () => {
           console.error(err)
           setMessages(messages + "\nGet csrf failed!")
         })
-      // setMessages(
-      //   messages +
-      //     "\nSuccessful Jailbreak - parent slipstream:\n" +
-      //     JSON.stringify(slipstream)
-      // )
     } catch (err) {
       console.error(err)
       setMessages(messages + "\nGet csrf failed!")
@@ -156,6 +151,29 @@ export default () => {
     }
   }
 
+  const thirdPartyApiButtonClick = () => {
+    try {
+      fetch(
+        "https://hacker-news.firebaseio.com/v0/item/160705.json?print=pretty"
+      )
+        .then((response: any) => response.json())
+        .then((json: any) =>
+          setMessages(
+            messages +
+              "\nThird party api succeeded!\n" +
+              JSON.stringify(json, undefined, 2)
+          )
+        )
+        .catch(err => {
+          console.error(err)
+          setMessages(messages + "\nThird party api failed!")
+        })
+    } catch (err) {
+      console.error(err)
+      setMessages(messages + "\nThird party api failed!")
+    }
+  }
+
   return (
     <>
       <h1>Sample Extension</h1>
@@ -199,6 +217,9 @@ export default () => {
             onClick={getConnectionsUsingExtensionsSdkButtonClick}
           >
             Get Connections Using Extensions SDK
+          </button>
+          <button style={{ margin: "10px" }} onClick={thirdPartyApiButtonClick}>
+            Call third party API
           </button>
         </div>
         <pre style={{ margin: "10px" }}>{messages}</pre>
