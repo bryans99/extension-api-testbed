@@ -1,9 +1,8 @@
 import * as React from "react"
-import { Chatty } from "@looker/chatty"
 import {
-  createExtensionHost,
   LookerExtensionSDK,
-  ExtensionHostApi
+  ExtensionHostApi,
+  connectExtensionHost
 } from "./extension/api"
 
 let lang: string = "TypeScript"
@@ -12,13 +11,8 @@ export default () => {
   const [extensionHost, setExtensionHost] = React.useState<ExtensionHostApi>()
   const [messages, setMessages] = React.useState("")
   React.useEffect(() => {
-    Chatty.createClient()
-      .withTargetOrigin("*")
-      .build()
-      .connect()
-      .then(_host => {
-        setExtensionHost(createExtensionHost(_host))
-      })
+    connectExtensionHost()
+      .then(extensionHost => setExtensionHost(extensionHost))
       .catch(console.error)
   }, [])
 
@@ -36,6 +30,42 @@ export default () => {
     }
   }
 
+  const getCsrfTokenClick = () => {
+    try {
+      fetch("https://self-signed.looker.com:9999/", {
+        // mode: "cors",
+        headers: {
+          "x-csrf-token": "68YKnzR8X3pxCHJcYgXVxiKJPI3R2aapSJShdxDk9gU="
+        }
+      })
+        .then((response: any) => {
+          console.log(response)
+          setMessages(messages + "\nGet csrf succeeded!")
+        })
+        .catch(err => {
+          console.error(err)
+          setMessages(messages + "\nGet csrf failed!")
+        })
+      // setMessages(
+      //   messages +
+      //     "\nSuccessful Jailbreak - parent slipstream:\n" +
+      //     JSON.stringify(slipstream)
+      // )
+    } catch (err) {
+      console.error(err)
+      setMessages(messages + "\nGet csrf failed!")
+    }
+  }
+
+  const openWindowButtonClick = () => {
+    try {
+      window.open("http://example.com", "_blank")
+    } catch (err) {
+      console.error(err)
+      setMessages(messages + "\nOpen window foiled!")
+    }
+  }
+
   const buttonClick = () => {
     if (extensionHost) {
       extensionHost
@@ -49,6 +79,36 @@ export default () => {
           setMessages(messages + "\nHost verification failure")
           console.error("Host verification failure", error)
         })
+    } else {
+      setMessages(messages + "\nWhere's my extension host?")
+      console.error("Where's my extension host?")
+    }
+  }
+
+  const updatePageTitleButtonClick = () => {
+    if (extensionHost) {
+      const date = new Date()
+      extensionHost.updatePageTitle(
+        `Extension Title Update ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+      )
+    } else {
+      setMessages(messages + "\nWhere's my extension host?")
+      console.error("Where's my extension host?")
+    }
+  }
+
+  const goToBrowseButtonClick = () => {
+    if (extensionHost) {
+      extensionHost.updateLocation("/browse")
+    } else {
+      setMessages(messages + "\nWhere's my extension host?")
+      console.error("Where's my extension host?")
+    }
+  }
+
+  const goToMarketplaceButtonClick = () => {
+    if (extensionHost) {
+      extensionHost.updateLocation("/marketplace")
     } else {
       setMessages(messages + "\nWhere's my extension host?")
       console.error("Where's my extension host?")
@@ -99,14 +159,50 @@ export default () => {
   return (
     <>
       <h1>Sample Extension</h1>
-      <p>This is a sample extension written in {lang}.</p>
-      <button onClick={jailbreakButtonClick}>Attempt jailbreak</button>
-      <button onClick={buttonClick}>Verify host connection</button>
-      <button onClick={getConnectionsButtonClick}>Get Connections</button>
-      <button onClick={getConnectionsUsingExtensionsSdkButtonClick}>
-        Get Connections Using Extensions SDK
-      </button>
-      <pre>{messages}</pre>
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
+          <button style={{ margin: "10px" }} onClick={jailbreakButtonClick}>
+            Attempt jailbreak
+          </button>
+          <button style={{ margin: "10px" }} onClick={openWindowButtonClick}>
+            Attempt open window
+          </button>
+          <button style={{ margin: "10px" }} onClick={getCsrfTokenClick}>
+            Get csrf token
+          </button>
+          <button
+            style={{ margin: "10px" }}
+            onClick={updatePageTitleButtonClick}
+          >
+            Update page title
+          </button>
+          <button style={{ margin: "10px" }} onClick={goToBrowseButtonClick}>
+            Go to browse
+          </button>
+          <button
+            style={{ margin: "10px" }}
+            onClick={goToMarketplaceButtonClick}
+          >
+            Go to Marketplace
+          </button>
+          <button style={{ margin: "10px" }} onClick={buttonClick}>
+            Verify host connection
+          </button>
+          <button
+            style={{ margin: "10px" }}
+            onClick={getConnectionsButtonClick}
+          >
+            Get Connections
+          </button>
+          <button
+            style={{ margin: "10px" }}
+            onClick={getConnectionsUsingExtensionsSdkButtonClick}
+          >
+            Get Connections Using Extensions SDK
+          </button>
+        </div>
+        <pre style={{ margin: "10px" }}>{messages}</pre>
+      </div>
     </>
   )
 }

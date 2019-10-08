@@ -1,4 +1,5 @@
 import { ChattyHostConnection } from "@looker/chatty"
+import { Chatty } from "@looker/chatty"
 import {
   IAuthorizer,
   IAccessToken,
@@ -35,7 +36,15 @@ export enum ExtensionRequestType {
   /**
    * Execute a call on the Looker CORE SDK
    */
-  INVOKE_CORE_SDK = "INVOKE_CORE_SDK"
+  INVOKE_CORE_SDK = "INVOKE_CORE_SDK",
+  /**
+   * Update page title
+   */
+  UPDATE_PAGE_TITLE = "UPDATE_PAGE_TITLE",
+  /**
+   * Update location
+   */
+  UPDATE_LOCATION = "UPDATE_LOCATION"
 }
 
 /**
@@ -61,6 +70,15 @@ export interface InvokeCoreSdkRequest {
   options?: any
 }
 
+export interface UpdatePageTitleRequest {
+  pageTitle: string
+}
+
+export interface UpdateLocationRequest {
+  url: string
+  state?: any
+}
+
 export interface ExtensionHostApi {
   verifyHostConnection(): Promise<boolean>
   invokeCoreSdkByName(
@@ -76,10 +94,22 @@ export interface ExtensionHostApi {
     params?: any,
     options?: any
   ): Promise<any>
+  updatePageTitle(pageTitle: string)
+  updateLocation(url: string, state?: any)
 }
 
 export interface ExtensionClientApi {
   handleRequest(message: ExtensionRequest): any | void
+}
+
+export const connectExtensionHost = () => {
+  return Chatty.createClient()
+    .withTargetOrigin("*")
+    .build()
+    .connect()
+    .then(_host => {
+      return createExtensionHost(_host)
+    })
 }
 
 class ExtensionHostApiImpl implements ExtensionHostApi {
@@ -117,6 +147,14 @@ class ExtensionHostApiImpl implements ExtensionHostApi {
     })
   }
 
+  updatePageTitle(pageTitle: string) {
+    this.send(ExtensionRequestType.UPDATE_PAGE_TITLE, { pageTitle })
+  }
+
+  updateLocation(url: string, state?: any) {
+    this.send(ExtensionRequestType.UPDATE_LOCATION, { url, state })
+  }
+
   async sendAndReceive(type: string, payload?: any): Promise<any> {
     return this.chattyHost
       .sendAndReceive(ExtensionEvent.EXTENSION_API_REQUEST, {
@@ -124,6 +162,13 @@ class ExtensionHostApiImpl implements ExtensionHostApi {
         payload
       })
       .then(values => values[0])
+  }
+
+  send(type: string, payload?: any) {
+    this.chattyHost.send(ExtensionEvent.EXTENSION_API_REQUEST, {
+      type,
+      payload
+    })
   }
 }
 
