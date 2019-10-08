@@ -107,9 +107,7 @@ export const connectExtensionHost = () => {
     .withTargetOrigin("*")
     .build()
     .connect()
-    .then(_host => {
-      return createExtensionHost(_host)
-    })
+    .then(_host => new ExtensionHostApiImpl(_host))
 }
 
 class ExtensionHostApiImpl implements ExtensionHostApi {
@@ -171,10 +169,6 @@ class ExtensionHostApiImpl implements ExtensionHostApi {
     })
   }
 }
-
-export const createExtensionHost = (
-  chattyHost: ChattyHostConnection
-): ExtensionHostApi => new ExtensionHostApiImpl(chattyHost)
 
 export class LookerExtensionSDK {
   /**
