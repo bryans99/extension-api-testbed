@@ -80,10 +80,10 @@ export default () => {
     }
   }
 
-  const updatePageTitleButtonClick = () => {
+  const updateTitleButtonClick = () => {
     if (extensionHost) {
       const date = new Date()
-      extensionHost.updatePageTitle(
+      extensionHost.updateTitle(
         `Extension Title Update ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
       )
     } else {
@@ -188,11 +188,8 @@ export default () => {
           <button style={{ margin: "10px" }} onClick={getCsrfTokenClick}>
             Get csrf token
           </button>
-          <button
-            style={{ margin: "10px" }}
-            onClick={updatePageTitleButtonClick}
-          >
-            Update page title
+          <button style={{ margin: "10px" }} onClick={updateTitleButtonClick}>
+            Update title
           </button>
           <button style={{ margin: "10px" }} onClick={goToBrowseButtonClick}>
             Go to browse

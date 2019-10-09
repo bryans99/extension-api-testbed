@@ -38,9 +38,9 @@ export enum ExtensionRequestType {
    */
   INVOKE_CORE_SDK = "INVOKE_CORE_SDK",
   /**
-   * Update page title
+   * Update title
    */
-  UPDATE_PAGE_TITLE = "UPDATE_PAGE_TITLE",
+  UPDATE_TITLE = "UPDATE_TITLE",
   /**
    * Update location
    */
@@ -70,8 +70,8 @@ export interface InvokeCoreSdkRequest {
   options?: any
 }
 
-export interface UpdatePageTitleRequest {
-  pageTitle: string
+export interface UpdateTitleRequest {
+  title: string
 }
 
 export interface UpdateLocationRequest {
@@ -94,7 +94,7 @@ export interface ExtensionHostApi {
     params?: any,
     options?: any
   ): Promise<any>
-  updatePageTitle(pageTitle: string)
+  updateTitle(title: string)
   updateLocation(url: string, state?: any)
 }
 
@@ -145,8 +145,8 @@ class ExtensionHostApiImpl implements ExtensionHostApi {
     })
   }
 
-  updatePageTitle(pageTitle: string) {
-    this.send(ExtensionRequestType.UPDATE_PAGE_TITLE, { pageTitle })
+  updateTitle(title: string) {
+    this.send(ExtensionRequestType.UPDATE_TITLE, { title })
   }
 
   updateLocation(url: string, state?: any) {
