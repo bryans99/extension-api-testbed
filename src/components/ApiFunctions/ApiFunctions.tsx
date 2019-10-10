@@ -3,63 +3,20 @@ import {
   LookerExtensionSDK,
   ExtensionHostApi,
   connectExtensionHost
-} from "./extension/api"
+} from "../../extension/api"
+import { Heading, Box, styled } from "looker-lens"
+import { ExtensionButton } from "../ExtensionButton"
 
-let lang: string = "TypeScript"
-
-export default () => {
+export const ApiFunctions = () => {
   const [extensionHost, setExtensionHost] = React.useState<ExtensionHostApi>()
   const [messages, setMessages] = React.useState("")
   React.useEffect(() => {
     connectExtensionHost()
-      .then(extensionHost => setExtensionHost(extensionHost))
+      .then(extensionHost => {
+        setExtensionHost(extensionHost)
+      })
       .catch(console.error)
   }, [])
-
-  const jailbreakButtonClick = () => {
-    try {
-      const slipstream = (window.parent as any).slipstream
-      setMessages(
-        messages +
-          "\nSuccessful Jailbreak - parent slipstream:\n" +
-          JSON.stringify(slipstream)
-      )
-    } catch (err) {
-      console.error(err)
-      setMessages(messages + "\nJailbreak foiled!")
-    }
-  }
-
-  const getCsrfTokenClick = () => {
-    try {
-      fetch("https://self-signed.looker.com:9999/", {
-        // mode: "cors",
-        headers: {
-          "x-csrf-token": "68YKnzR8X3pxCHJcYgXVxiKJPI3R2aapSJShdxDk9gU="
-        }
-      })
-        .then((response: any) => {
-          console.log(response)
-          setMessages(messages + "\nGet csrf succeeded!")
-        })
-        .catch(err => {
-          console.error(err)
-          setMessages(messages + "\nGet csrf failed!")
-        })
-    } catch (err) {
-      console.error(err)
-      setMessages(messages + "\nGet csrf failed!")
-    }
-  }
-
-  const openWindowButtonClick = () => {
-    try {
-      window.open("http://example.com", "_blank")
-    } catch (err) {
-      console.error(err)
-      setMessages(messages + "\nOpen window foiled!")
-    }
-  }
 
   const buttonClick = () => {
     if (extensionHost) {
@@ -151,76 +108,61 @@ export default () => {
     }
   }
 
-  const thirdPartyApiButtonClick = () => {
-    try {
-      fetch(
-        "https://hacker-news.firebaseio.com/v0/item/160705.json?print=pretty"
-      )
-        .then((response: any) => response.json())
-        .then((json: any) =>
-          setMessages(
-            messages +
-              "\nThird party api succeeded!\n" +
-              JSON.stringify(json, undefined, 2)
-          )
-        )
-        .catch(err => {
-          console.error(err)
-          setMessages(messages + "\nThird party api failed!")
-        })
-    } catch (err) {
-      console.error(err)
-      setMessages(messages + "\nThird party api failed!")
-    }
-  }
-
   return (
     <>
-      <h1>Sample Extension</h1>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
-          <button style={{ margin: "10px" }} onClick={jailbreakButtonClick}>
-            Attempt jailbreak
-          </button>
-          <button style={{ margin: "10px" }} onClick={openWindowButtonClick}>
-            Attempt open window
-          </button>
-          <button style={{ margin: "10px" }} onClick={getCsrfTokenClick}>
-            Get csrf token
-          </button>
-          <button style={{ margin: "10px" }} onClick={updateTitleButtonClick}>
+      <Heading my="xlarge">API Functions</Heading>
+      <Box display="flex" flexDirection="row">
+        <Box display="flex" flexDirection="column" width="50%">
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={updateTitleButtonClick}
+          >
             Update title
-          </button>
-          <button style={{ margin: "10px" }} onClick={goToBrowseButtonClick}>
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={goToBrowseButtonClick}
+          >
             Go to browse
-          </button>
-          <button
-            style={{ margin: "10px" }}
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
             onClick={goToMarketplaceButtonClick}
           >
             Go to Marketplace
-          </button>
-          <button style={{ margin: "10px" }} onClick={buttonClick}>
+          </ExtensionButton>
+          <ExtensionButton mt="small" variant="outline" onClick={buttonClick}>
             Verify host connection
-          </button>
-          <button
-            style={{ margin: "10px" }}
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
             onClick={getConnectionsButtonClick}
           >
             Get Connections
-          </button>
-          <button
-            style={{ margin: "10px" }}
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
             onClick={getConnectionsUsingExtensionsSdkButtonClick}
           >
             Get Connections Using Extensions SDK
-          </button>
-          <button style={{ margin: "10px" }} onClick={thirdPartyApiButtonClick}>
-            Call third party API
-          </button>
-        </div>
-        <pre style={{ margin: "10px" }}>{messages}</pre>
-      </div>
+          </ExtensionButton>
+        </Box>
+        <Box width="50%" pr="large">
+          <StyledPre>{messages}</StyledPre>
+        </Box>
+      </Box>
     </>
   )
 }
+
+const StyledPre = styled.pre`
+  margin: 0 0 0 20px;
+  border: 1px solid #c1c6cc;
+  height: 100%;
+  padding: 20px;
+`

@@ -1,11 +1,28 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import Extension from "./Extension"
+import { App } from "./App"
+import { injectGlobal } from "styled-components"
 
-const createMountPoint = () => {
-  var mountPoint = document.createElement("div")
-  document.body.appendChild(mountPoint)
-  return mountPoint
-}
+var link = document.createElement("link")
+link.href = "https://fonts.googleapis.com/css?family=Open+Sans&display=swap"
+link.rel = "stylesheet"
+document.head.appendChild(link)
+injectGlobal`
+    body,
+    button,
+    input,
+    textarea,
+    select {
+      font-family: 'Open Sans', sans-serif;
+    }
+    body {
+      padding: 0;
+      margin: 0;
+    }
+`
 
-ReactDOM.render(<Extension />, createMountPoint())
+window.addEventListener("DOMContentLoaded", event => {
+  var root = document.createElement("div")
+  document.body.appendChild(root)
+  ReactDOM.render(<App />, root)
+})
