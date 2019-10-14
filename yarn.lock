@@ -915,6 +915,13 @@
     "@types/tough-cookie" "*"
     form-data "^2.5.0"
 
+"@types/styled-system@^3.0":
+  version "3.2.2"
+  resolved "https://nexusrepo.looker.com/repository/looker-npm-group/@types/styled-system/-/styled-system-3.2.2.tgz#a40b30baf20a8d9820808688a370a973cb778e7c"
+  integrity sha512-QjjszVXRIeAT1fAQewWKh1Ewq3/i6xeYp2DH7DC151FfnLNtUbjT8CxUuqpnKrRiessoKdQVLw+3xu/RiMpNBQ==
+  dependencies:
+    csstype "^2.2.0"
+
 "@types/tough-cookie@*":
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.5.tgz#9da44ed75571999b65c37b60c9b2b88db54c585d"

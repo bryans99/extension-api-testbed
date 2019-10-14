@@ -18,6 +18,10 @@ import {
  */
 export enum ExtensionEvent {
   /**
+   * Notification from host to client
+   */
+  EXTENSION_HOST_NOTIFICATION = "EXTENSION_NOTIFICATION",
+  /**
    * Process request from client. This is actually a sendAndRecieve request
    */
   EXTENSION_API_REQUEST = "EXTENSION_API_REQUEST"
@@ -44,7 +48,11 @@ export enum ExtensionRequestType {
   /**
    * Update location
    */
-  UPDATE_LOCATION = "UPDATE_LOCATION"
+  UPDATE_LOCATION = "UPDATE_LOCATION",
+  /**
+   * Location route changed
+   */
+  ROUTE_CHANGED = "ROUTE_CHANGED"
 }
 
 /**
@@ -80,6 +88,7 @@ export interface UpdateLocationRequest {
 }
 
 export interface ExtensionHostApi {
+  handleNotification(message: ExtensionNotification): any | void
   verifyHostConnection(): Promise<boolean>
   invokeCoreSdkByName(
     methodName: string,
@@ -102,16 +111,113 @@ export interface ExtensionClientApi {
   handleRequest(message: ExtensionRequest): any | void
 }
 
-export const connectExtensionHost = () => {
+export interface RouteChangeRequest {
+  route: string
+}
+
+/**
+ * Notification type
+ */
+export enum ExtensionNotificationType {
+  /**
+   * Initialize message sent when chatty host and client have established
+   * communication
+   */
+  INITIALIZE = "INITIALIZE"
+}
+
+/**
+ * Initialize notification payload
+ */
+export interface InitializeNotification {
+  route?: string
+}
+
+/**
+ * Extension
+ */
+export interface ExtensionNotification {
+  type: ExtensionNotificationType
+  payload?: InitializeNotification | undefined
+}
+
+export interface ExtensionHostConfiguration {
+  initializedCallback?: () => void
+  restoreRoute?: boolean
+}
+
+export interface ExtensionHostApiConfiguration
+  extends ExtensionHostConfiguration {
+  chattyHost: ChattyHostConnection
+}
+
+export const connectExtensionHost = (
+  configuration: ExtensionHostConfiguration = {}
+) => {
+  let extensionHost: ExtensionHostApi
   return Chatty.createClient()
+    .on(ExtensionEvent.EXTENSION_HOST_NOTIFICATION, (message: any) => {
+      if (!message) {
+        throw new Error("Message not recieved from host")
+      }
+      if (extensionHost) {
+        return extensionHost.handleNotification(message)
+      }
+      throw new Error("Extension client not initialized")
+    })
     .withTargetOrigin("*")
+    .withDefaultTimeout(-1)
     .build()
     .connect()
-    .then(_host => new ExtensionHostApiImpl(_host))
+    .then(_host => {
+      extensionHost = new ExtensionHostApiImpl({
+        chattyHost: _host,
+        ...configuration
+      })
+      return extensionHost
+    })
 }
 
 class ExtensionHostApiImpl implements ExtensionHostApi {
-  constructor(private chattyHost: ChattyHostConnection) {}
+  private currentRoute: string | undefined
+  private chattyHost: ChattyHostConnection
+  private initializedCallback: (payload?: InitializeNotification) => void
+  private restoreRoute?: boolean
+
+  constructor(configuration: ExtensionHostApiConfiguration) {
+    const { chattyHost, initializedCallback, restoreRoute } = configuration
+    this.chattyHost = chattyHost
+    this.initializedCallback = initializedCallback
+    this.restoreRoute = restoreRoute
+    window.addEventListener("hashchange", () => {
+      this.fireRouteChange()
+    })
+  }
+
+  handleNotification(message: ExtensionNotification): any | void {
+    const { type, payload } = message
+    switch (type) {
+      case ExtensionNotificationType.INITIALIZE:
+        if (this.restoreRoute && payload) {
+          const { route } = payload
+          if (route) {
+            if (window.location.hash === "") {
+              window.location.hash = route
+              this.fireRouteChange()
+            }
+          }
+        }
+        if (this.initializedCallback) {
+          this.initializedCallback()
+        }
+        break
+      default:
+        console.error("Unrecognized extension notification", message)
+        throw new Error(
+          `Unrecognized extension notification type ${message.type}`
+        )
+    }
+  }
 
   async verifyHostConnection() {
     return this.sendAndReceive(ExtensionRequestType.VERIFY_HOST)
@@ -151,6 +257,13 @@ class ExtensionHostApiImpl implements ExtensionHostApi {
 
   updateLocation(url: string, state?: any) {
     this.send(ExtensionRequestType.UPDATE_LOCATION, { url, state })
+  }
+
+  async fireRouteChange() {
+    this.currentRoute = location.hash
+    this.send(ExtensionRequestType.ROUTE_CHANGED, {
+      route: this.currentRoute
+    })
   }
 
   async sendAndReceive(type: string, payload?: any): Promise<any> {

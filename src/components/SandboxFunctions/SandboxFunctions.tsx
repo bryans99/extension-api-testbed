@@ -1,22 +1,10 @@
 import * as React from "react"
-import {
-  LookerExtensionSDK,
-  ExtensionHostApi,
-  connectExtensionHost
-} from "../../extension/api"
-import { Heading, Button, Box, styled } from "looker-lens"
+import { ExtensionHostApi, connectExtensionHost } from "../../extension/api"
+import { Heading, Box, styled } from "looker-lens"
 import { ExtensionButton } from "../ExtensionButton"
 
 export const SandboxFunctions = () => {
-  const [extensionHost, setExtensionHost] = React.useState<ExtensionHostApi>()
   const [messages, setMessages] = React.useState("")
-  React.useEffect(() => {
-    connectExtensionHost()
-      .then(extensionHost => {
-        setExtensionHost(extensionHost)
-      })
-      .catch(console.error)
-  }, [])
 
   const jailbreakButtonClick = () => {
     try {
@@ -32,25 +20,65 @@ export const SandboxFunctions = () => {
     }
   }
 
-  const getCsrfTokenClick = () => {
+  const getCsrfTokenUsingFetchClick = () => {
     try {
       fetch("https://self-signed.looker.com:9999/", {
-        // mode: "cors",
-        headers: {
-          "x-csrf-token": "68YKnzR8X3pxCHJcYgXVxiKJPI3R2aapSJShdxDk9gU="
-        }
+        mode: "no-cors"
       })
         .then((response: any) => {
-          console.log(response)
-          setMessages(messages + "\nGet csrf succeeded!")
+          console.log(">>>>", response)
+          return response.body
+        })
+        .then(body => {
+          setMessages(messages + "\nGet using fetch succeeded. Body=" + body)
+          console.log(">>>>", body)
         })
         .catch(err => {
           console.error(err)
-          setMessages(messages + "\nGet csrf failed!")
+          setMessages(messages + "\nGet csrf fetch failed!")
         })
     } catch (err) {
       console.error(err)
-      setMessages(messages + "\nGet csrf failed!")
+      setMessages(messages + "\nGet csrf using fetch failed!")
+    }
+  }
+
+  const getCsrfTokenUsingXHRClick = () => {
+    try {
+      const req = new XMLHttpRequest()
+      req.addEventListener("load", event => {
+        setMessages(messages + "\nGet using XHR succeeded.")
+      })
+      req.addEventListener("error", event => {
+        setMessages(messages + "\nGet using XHR failed.")
+      })
+      req.open("GET", "https://self-signed.looker.com:9999/")
+      req.setRequestHeader("mode", "no-cors")
+      req.send()
+    } catch (error) {
+      console.error(error)
+      setMessages(messages + "\nGet csrf using XHR failed!")
+    }
+  }
+
+  const callAllConnectionClick = () => {
+    try {
+      fetch(
+        "https://self-signed.looker.com:9999/api/internal/core/3.1/connections",
+        {
+          mode: "no-cors"
+        }
+      )
+        .then((response: any) => {
+          setMessages(messages + "\nAll connections succeeded!")
+        })
+        .catch(err => {
+          console.error(err)
+          setMessages(messages + "\nAll connections failed!")
+        })
+    } catch (err) {
+      console.error(err)
+      setMessages(messages + "\nAll connections failed!")
     }
   }
 
@@ -123,9 +151,16 @@ export const SandboxFunctions = () => {
           <ExtensionButton
             mt="small"
             variant="outline"
-            onClick={getCsrfTokenClick}
+            onClick={getCsrfTokenUsingFetchClick}
           >
-            Get csrf token
+            Get csrf token using fetch
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={getCsrfTokenUsingXHRClick}
+          >
+            Get csrf token using xhr
           </ExtensionButton>
           <ExtensionButton
             mt="small"
@@ -147,6 +182,13 @@ export const SandboxFunctions = () => {
             onClick={saveLocalStorageButtonClick}
           >
             Save to local storage
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={callAllConnectionClick}
+          >
+            Call all_connections directly
           </ExtensionButton>
         </Box>
         <Box width="50%" pr="large">

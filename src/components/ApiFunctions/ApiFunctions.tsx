@@ -1,99 +1,49 @@
 import * as React from "react"
-import {
-  LookerExtensionSDK,
-  ExtensionHostApi,
-  connectExtensionHost
-} from "../../extension/api"
+import { LookerExtensionSDK, ExtensionHostApi } from "../../extension/api"
 import { Heading, Box, styled } from "looker-lens"
 import { ExtensionButton } from "../ExtensionButton"
+import { ApiFunctionsProps } from "./types"
 
-export const ApiFunctions = () => {
-  const [extensionHost, setExtensionHost] = React.useState<ExtensionHostApi>()
+export const ApiFunctions: React.FC<ApiFunctionsProps> = ({
+  extensionHost
+}) => {
   const [messages, setMessages] = React.useState("")
-  React.useEffect(() => {
-    connectExtensionHost()
-      .then(extensionHost => {
-        setExtensionHost(extensionHost)
-      })
-      .catch(console.error)
-  }, [])
 
   const buttonClick = () => {
-    if (extensionHost) {
-      extensionHost
-        .verifyHostConnection()
-        .then(value => {
-          if (value === true) {
-            setMessages(messages + "\nHost verification success")
-          }
-        })
-        .catch(error => {
-          setMessages(messages + "\nHost verification failure")
-          console.error("Host verification failure", error)
-        })
-    } else {
-      setMessages(messages + "\nWhere's my extension host?")
-      console.error("Where's my extension host?")
-    }
+    extensionHost
+      .verifyHostConnection()
+      .then(value => {
+        if (value === true) {
+          setMessages(messages + "\nHost verification success")
+        } else {
+          setMessages(messages + "\nInvalid response " + value)
+        }
+      })
+      .catch(error => {
+        setMessages(messages + "\nHost verification failure")
+        console.error("Host verification failure", error)
+      })
   }
 
   const updateTitleButtonClick = () => {
-    if (extensionHost) {
-      const date = new Date()
-      extensionHost.updateTitle(
-        `Extension Title Update ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
-      )
-    } else {
-      setMessages(messages + "\nWhere's my extension host?")
-      console.error("Where's my extension host?")
-    }
+    const date = new Date()
+    extensionHost.updateTitle(
+      `Extension Title Update ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+    )
   }
 
   const goToBrowseButtonClick = () => {
-    if (extensionHost) {
-      extensionHost.updateLocation("/browse")
-    } else {
-      setMessages(messages + "\nWhere's my extension host?")
-      console.error("Where's my extension host?")
-    }
+    extensionHost.updateLocation("/browse")
   }
 
   const goToMarketplaceButtonClick = () => {
-    if (extensionHost) {
-      extensionHost.updateLocation("/marketplace")
-    } else {
-      setMessages(messages + "\nWhere's my extension host?")
-      console.error("Where's my extension host?")
-    }
+    extensionHost.updateLocation("/marketplace")
   }
 
   const getConnectionsButtonClick = () => {
-    if (extensionHost) {
-      extensionHost
-        .invokeCoreSdkByName("all_connections")
-        .then(response => {
-          if (response.ok) {
-            let message = ""
-            response.value.forEach(connection => {
-              message += connection.name + "\n"
-            })
-            setMessages(messages + "\n" + message)
-          }
-        })
-        .catch(error => {
-          setMessages(messages + "\nGet connections failure")
-          console.error("Get connections failure", error)
-        })
-    } else {
-      setMessages(messages + "\nWhere's my extension host?")
-      console.error("Where's my extension host?")
-    }
-  }
-
-  const getConnectionsUsingExtensionsSdkButtonClick = () => {
-    if (extensionHost) {
-      const sdk = LookerExtensionSDK.createClient(extensionHost)
-      sdk.all_connections().then((response: any) => {
+    extensionHost
+      .invokeCoreSdkByName("all_connections")
+      .then(response => {
         if (response.ok) {
           let message = ""
           response.value.forEach(connection => {
@@ -102,10 +52,23 @@ export const ApiFunctions = () => {
           setMessages(messages + "\n" + message)
         }
       })
-    } else {
-      setMessages(messages + "\nWhere's my host?")
-      console.error("Where's my host?")
-    }
+      .catch(error => {
+        setMessages(messages + "\nGet connections failure")
+        console.error("Get connections failure", error)
+      })
+  }
+
+  const getConnectionsUsingCoreSdkButtonClick = () => {
+    const sdk = LookerExtensionSDK.createClient(extensionHost)
+    sdk.all_connections().then((response: any) => {
+      if (response.ok) {
+        let message = ""
+        response.value.forEach(connection => {
+          message += connection.name + "\n"
+        })
+        setMessages(messages + "\n" + message)
+      }
+    })
   }
 
   return (
@@ -125,14 +88,14 @@ export const ApiFunctions = () => {
             variant="outline"
             onClick={goToBrowseButtonClick}
           >
-            Go to browse
+            Go to browse (update location)
           </ExtensionButton>
           <ExtensionButton
             mt="small"
             variant="outline"
             onClick={goToMarketplaceButtonClick}
           >
-            Go to Marketplace
+            Go to Marketplace (update location)
           </ExtensionButton>
           <ExtensionButton mt="small" variant="outline" onClick={buttonClick}>
             Verify host connection
@@ -142,14 +105,14 @@ export const ApiFunctions = () => {
             variant="outline"
             onClick={getConnectionsButtonClick}
           >
-            Get Connections
+            Get connections using api name
           </ExtensionButton>
           <ExtensionButton
             mt="small"
             variant="outline"
-            onClick={getConnectionsUsingExtensionsSdkButtonClick}
+            onClick={getConnectionsUsingCoreSdkButtonClick}
           >
-            Get Connections Using Extensions SDK
+            Get connections using Core SDK
           </ExtensionButton>
         </Box>
         <Box width="50%" pr="large">
