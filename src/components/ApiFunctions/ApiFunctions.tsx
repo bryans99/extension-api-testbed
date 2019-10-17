@@ -1,5 +1,5 @@
 import * as React from "react"
-import { LookerExtensionSDK, ExtensionHostApi } from "../../extension/api"
+import { LookerExtensionSDK } from "bryns-extension-api"
 import { Heading, Box, styled } from "looker-lens"
 import { ExtensionButton } from "../ExtensionButton"
 import { ApiFunctionsProps } from "./types"

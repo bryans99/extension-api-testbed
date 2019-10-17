@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom"
 import { App } from "./App"
 import { injectGlobal } from "styled-components"
 
+// LENS setup
 var link = document.createElement("link")
 link.href = "https://fonts.googleapis.com/css?family=Open+Sans&display=swap"
 link.rel = "stylesheet"
@@ -24,5 +25,5 @@ injectGlobal`
 window.addEventListener("DOMContentLoaded", event => {
   var root = document.createElement("div")
   document.body.appendChild(root)
-  ReactDOM.render(<App />, root)
+  ReactDOM.render(<App standalone={window.top === window} />, root)
 })
