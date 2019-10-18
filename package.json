@@ -5,7 +5,7 @@
   "scripts": {
     "start": "parcel dev.html --https --no-hmr",
     "build": "parcel build src/index.tsx",
-    "install": "cp dist/index.js ~/looker/helltool/looker/models-user-1/bryn_extension_core_api/core_api_test.js"
+    "deploy": "cp dist/index.js ~/looker/helltool/looker/models-user-1/bryn_extension_core_api/core_api_test.js"
   },
   "license": "MIT",
   "dependencies": {

@@ -1,4 +1,4 @@
-import { ExtensionHostApi } from "../../extension/api"
+import { ExtensionHostApi } from "bryns-extension-api"
 
 export interface ApiFunctionsProps {
   extensionHost: ExtensionHostApi

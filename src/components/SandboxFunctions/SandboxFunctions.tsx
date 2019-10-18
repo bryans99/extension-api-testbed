@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ExtensionHostApi, connectExtensionHost } from "../../extension/api"
+import { ExtensionHostApi, connectExtensionHost } from "bryns-extension-api"
 import { Heading, Box, styled } from "looker-lens"
 import { ExtensionButton } from "../ExtensionButton"
 

@@ -6,6 +6,7 @@ import { SidebarProps } from "./"
 
 const API_ROUTE = "/api"
 const SANDBOX_ROUTE = "/sandbox"
+const LENS_ROUTE = "/lens"
 
 export const Sidebar: React.FC<SidebarProps> = ({ pathname }) => {
   return (
@@ -31,6 +32,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ pathname }) => {
             pl="none"
           >
             Sandbox Functions
+          </MenuItem>
+        </StyledRouterLink>
+        <StyledRouterLink to={LENS_ROUTE}>
+          <MenuItem
+            icon="Clock"
+            is="span"
+            currentMarker
+            current={pathname === LENS_ROUTE}
+            pl="none"
+          >
+            Lens Playground
           </MenuItem>
         </StyledRouterLink>
       </MenuGroup>

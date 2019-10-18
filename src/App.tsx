@@ -3,8 +3,7 @@ import { SandboxFunctions } from "./components/SandboxFunctions"
 import { ApiFunctions } from "./components/ApiFunctions"
 import React, { useState } from "react"
 import {
-  MemoryRouter,
-  HashRouter,
+  MemoryRouter as Router,
   Switch,
   Route,
   Redirect
@@ -12,21 +11,24 @@ import {
 import { RouteChangeListener } from "./RouteChangeListener"
 import { ThemeProvider, theme, Box, styled } from "looker-lens"
 import { ExtensionHostApi, connectExtensionHost } from "bryns-extension-api"
+import { LensPlayground } from "./components/LensPlayground"
 
 interface AppProps {
   standalone?: boolean
 }
 
+enum ROUTES {
+  API_ROUTE = "/api",
+  SANDBOX_ROUTE = "/sandbox",
+  LENS_ROUTE = "/lens"
+}
+const routes = Object.keys(ROUTES).map(route => ROUTES[route])
+
 export const App: React.FC<AppProps> = ({ standalone }) => {
   const [pathname, setPathname] = useState("")
+  const [initialRoute, setInitialRoute] = useState()
   const [hostInitialized, setHostInitialized] = useState(false)
   const [extensionHost, setExtensionHost] = React.useState<ExtensionHostApi>()
-
-  // Edge does not like updates to location.hash. Fallback to MemoryRouter
-  const Router =
-    navigator.userAgent.indexOf("Edge") > -1 && !standalone
-      ? MemoryRouter
-      : HashRouter
 
   const initialized = () => {
     setHostInitialized(true)
@@ -35,7 +37,8 @@ export const App: React.FC<AppProps> = ({ standalone }) => {
   React.useEffect(() => {
     connectExtensionHost({
       initializedCallback: initialized,
-      restoreRoute: true
+      restoreRoute: true,
+      setInitialRoute
     })
       .then(extensionHost => {
         setExtensionHost(extensionHost)
@@ -45,25 +48,37 @@ export const App: React.FC<AppProps> = ({ standalone }) => {
 
   const renderRouter = hostInitialized || standalone
 
-  console.log(">>>>>", navigator.userAgent, renderRouter)
+  let defaultRoute
+  if (renderRouter) {
+    defaultRoute = initialRoute
+    if (!routes.includes(initialRoute)) {
+      defaultRoute = ROUTES.API_ROUTE
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
       <div>
         {renderRouter && (
           <Router>
-            <RouteChangeListener setPathname={setPathname} />
+            <RouteChangeListener
+              setPathname={setPathname}
+              extensionHost={extensionHost}
+            />
             <Layout>
               <Sidebar pathname={pathname} />
               <Box>
                 <Switch>
-                  <Route path="/api">
+                  <Route path={ROUTES.API_ROUTE}>
                     <ApiFunctions extensionHost={extensionHost} />
                   </Route>
-                  <Route path="/sandbox">
+                  <Route path={ROUTES.SANDBOX_ROUTE}>
                     <SandboxFunctions />
                   </Route>
-                  <Redirect to="/api" />
+                  <Route path={ROUTES.LENS_ROUTE}>
+                    <LensPlayground />
+                  </Route>
+                  <Redirect to={defaultRoute} />
                 </Switch>
               </Box>
             </Layout>
