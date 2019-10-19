@@ -8,6 +8,7 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = ({
   extensionHost
 }) => {
   const [messages, setMessages] = React.useState("")
+  const sdk = LookerExtensionSDK.createClient(extensionHost)
 
   const buttonClick = () => {
     extensionHost
@@ -59,7 +60,6 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = ({
   }
 
   const getConnectionsUsingCoreSdkButtonClick = () => {
-    const sdk = LookerExtensionSDK.createClient(extensionHost)
     sdk.all_connections().then((response: any) => {
       if (response.ok) {
         let message = ""
@@ -69,6 +69,26 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = ({
         setMessages(messages + "\n" + message)
       }
     })
+  }
+
+  const inlineQueryClick = () => {
+    sdk
+      .run_inline_query({
+        result_format: "json_detail",
+        limit: 10,
+        body: {
+          total: true,
+          model: "thelook",
+          view: "users",
+          fields: ["last_name", "gender"],
+          sorts: [`last_name desc`]
+        }
+      })
+      .then((response: any) => {
+        if (response.ok) {
+          setMessages(messages + "\n" + JSON.stringify(response.value, null, 2))
+        }
+      })
   }
 
   return (
@@ -113,6 +133,13 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = ({
             onClick={getConnectionsUsingCoreSdkButtonClick}
           >
             Get connections using Core SDK
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={inlineQueryClick}
+          >
+            Inline Query
           </ExtensionButton>
         </Box>
         <Box width="50%" pr="large">
