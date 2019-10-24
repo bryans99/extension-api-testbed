@@ -22,7 +22,7 @@ export const App: React.FC<AppProps> = ({ standalone }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <ExtensionWrapper setPathname={setPathname}>
+      <ExtensionWrapper onPathnameChange={setPathname}>
         <Layout>
           <Sidebar pathname={pathname} />
           <Box>

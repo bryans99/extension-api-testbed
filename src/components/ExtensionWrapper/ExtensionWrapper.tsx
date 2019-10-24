@@ -9,22 +9,54 @@ import { LookerSDK } from "@looker/sdk/dist/sdk/methods"
 
 export { LookerSDK }
 
+/**
+ * Extension context
+ */
 export interface ExtensionContextData {
+  /**
+   * Extension API.
+   */
   extensionSDK: ExtensionHostApi
+  /**
+   * Looker SDK. Note that SDK calls are made by the extension host.
+   */
   coreSDK: LookerSDK
 }
 
+/**
+ * React context provider for extension API and SDK
+ */
 export const ExtensionContext = React.createContext<ExtensionContextData>(
   undefined as any // no one will ever see this undefined!
 )
 
 export interface ExtensionWrapperProps {
-  setPathname?: (pathname: string) => void
+  /**
+   * When true, host will track the clients route (client route will be appened to
+   * host route). Note that this is only supported where the extension is mounted
+   * in the main extension view. If the extension is mounted as a component of a
+   * looker composite component (dashboard for example), hostTracksRoute will be
+   * ignored.
+   */
+  hostTracksRoute?: boolean
+  /**
+   * Pathname change callback. Use when extension components need to modify their
+   * state based upon the current route.
+   */
+  onPathnameChange?: (pathname: string) => void
+  /**
+   * Extension components
+   */
   children: any
 }
 
+/**
+ * ExtensionWrapper component. Provides access to the extension API and SDK (use
+ * ExtensionContext) and react routing services.
+ */
 export const ExtensionWrapper: React.FC<ExtensionWrapperProps> = ({
-  setPathname,
+  onPathnameChange,
+  hostTracksRoute = true,
   children
 }) => {
   const [initialRoute, setInitialRoute] = useState()
@@ -40,7 +72,7 @@ export const ExtensionWrapper: React.FC<ExtensionWrapperProps> = ({
   React.useEffect(() => {
     connectExtensionHost({
       initializedCallback: initialized,
-      restoreRoute: true,
+      restoreRoute: hostTracksRoute,
       setInitialRoute
     })
       .then(extensionHost => {
@@ -53,12 +85,16 @@ export const ExtensionWrapper: React.FC<ExtensionWrapperProps> = ({
       .catch(console.error)
   }, [])
 
+  const initialEntries: string[] | undefined = initialRoute
+    ? [initialRoute]
+    : undefined
+
   return (
     <>
       {hostInitialized && (
-        <MemoryRouter initialEntries={[initialRoute]}>
+        <MemoryRouter initialEntries={initialEntries}>
           <RouteChangeListener
-            setPathname={setPathname}
+            onPathnameChange={onPathnameChange}
             extensionHost={extensionData!.extensionSDK}
           />
           <ExtensionContext.Provider value={extensionData!}>
@@ -71,18 +107,18 @@ export const ExtensionWrapper: React.FC<ExtensionWrapperProps> = ({
 }
 
 interface RouteChangeListenerProps {
-  setPathname?: (pathname: string) => void
+  onPathnameChange?: (pathname: string) => void
   extensionHost: ExtensionHostApi
 }
 
 const RouteChangeListener: React.FC<RouteChangeListenerProps> = ({
-  setPathname,
+  onPathnameChange,
   extensionHost
 }) => {
   let location = useLocation()
   React.useEffect(() => {
-    if (setPathname) {
-      setPathname(location.pathname)
+    if (onPathnameChange) {
+      onPathnameChange(location.pathname)
     }
     extensionHost.clientRouteChanged(location.pathname)
   }, [location])
