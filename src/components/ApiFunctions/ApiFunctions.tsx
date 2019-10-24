@@ -43,7 +43,7 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = () => {
   }
 
   const openMarketplaceButtonClick = () => {
-    extensionHost.updateLocation("/marketplace", undefined, "_marketplace")
+    extensionHost.openBrowserWindow("/marketplace", "_marketplace")
   }
 
   const getConnectionsButtonClick = () => {

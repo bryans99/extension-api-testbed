@@ -14,7 +14,7 @@
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
     "@types/styled-system": "^3.0",
-    "bryns-extension-api": "0.1.5",
+    "bryns-extension-api": "0.1.6",
     "looker-lens": "^0.0.1-beta.25",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
