@@ -42,6 +42,10 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = () => {
     extensionHost.updateLocation("/marketplace")
   }
 
+  const openMarketplaceButtonClick = () => {
+    extensionHost.updateLocation("/marketplace", undefined, "_marketplace")
+  }
+
   const getConnectionsButtonClick = () => {
     extensionHost
       .invokeCoreSdkByName("all_connections")
@@ -117,6 +121,13 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = () => {
             onClick={goToMarketplaceButtonClick}
           >
             Go to Marketplace (update location)
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={openMarketplaceButtonClick}
+          >
+            Open marketplace new window
           </ExtensionButton>
           <ExtensionButton mt="small" variant="outline" onClick={buttonClick}>
             Verify host connection
