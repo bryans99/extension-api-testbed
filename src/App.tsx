@@ -5,7 +5,7 @@ import React, { useState } from "react"
 import { Switch, Route, Redirect } from "react-router-dom"
 import { ThemeProvider, theme, Box, styled } from "looker-lens"
 import { LensPlayground } from "./components/LensPlayground"
-import { ExtensionWrapper } from "./components/ExtensionWrapper"
+import { ExtensionProvider } from "@looker/extension-sdk-react"
 
 interface AppProps {
   standalone?: boolean
@@ -22,7 +22,7 @@ export const App: React.FC<AppProps> = ({ standalone }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <ExtensionWrapper onPathnameChange={setPathname}>
+      <ExtensionProvider onPathnameChange={setPathname}>
         <Layout>
           <Sidebar pathname={pathname} />
           <Box>
@@ -40,7 +40,7 @@ export const App: React.FC<AppProps> = ({ standalone }) => {
             </Switch>
           </Box>
         </Layout>
-      </ExtensionWrapper>
+      </ExtensionProvider>
     </ThemeProvider>
   )
 }
