@@ -1,8 +1,9 @@
-import { Box, MenuGroup, MenuItem } from "looker-lens"
+import { Box, MenuGroup, MenuItem, MenuItemProps } from "@looker/components"
 import * as React from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, LinkProps } from "react-router-dom"
 import styled from "styled-components"
 import { SidebarProps } from "./"
+import omit from "lodash/omit"
 
 const API_ROUTE = "/api"
 const SANDBOX_ROUTE = "/sandbox"
@@ -13,35 +14,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ pathname }) => {
     <Box display="flex" flexDirection="column">
       <MenuGroup type="none" mt="xsmall">
         <StyledRouterLink to={API_ROUTE}>
-          <MenuItem
-            icon="Flag"
-            is="span"
-            currentMarker
-            current={pathname === API_ROUTE}
-            pl="none"
-          >
+          <MenuItem icon="Flag" current={pathname === API_ROUTE}>
             Api Functions
           </MenuItem>
         </StyledRouterLink>
         <StyledRouterLink to={SANDBOX_ROUTE}>
-          <MenuItem
-            icon="Clock"
-            is="span"
-            currentMarker
-            current={pathname === SANDBOX_ROUTE}
-            pl="none"
-          >
+          <MenuItem icon="Clock" current={pathname === SANDBOX_ROUTE}>
             Sandbox Functions
           </MenuItem>
         </StyledRouterLink>
         <StyledRouterLink to={LENS_ROUTE}>
-          <MenuItem
-            icon="Clock"
-            is="span"
-            currentMarker
-            current={pathname === LENS_ROUTE}
-            pl="none"
-          >
+          <MenuItem icon="Clock" current={pathname === LENS_ROUTE}>
             Lens Playground
           </MenuItem>
         </StyledRouterLink>
@@ -50,7 +33,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ pathname }) => {
   )
 }
 
-const StyledRouterLink = styled(RouterLink)`
+const StyledRouterLinkInner: React.FC<LinkProps & MenuItemProps> = props => (
+  <RouterLink {...omit(props, "customizationProps")} />
+)
+
+const StyledRouterLink = styled(StyledRouterLinkInner)`
   text-decoration: none;
   &:focus,
   &:hover,

@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Button, styled } from "looker-lens"
+import { ButtonOutline } from "@looker/components"
+import styled from "styled-components"
 
 export const ExtensionButton: React.FC<any> = ({
   children,
@@ -7,13 +8,13 @@ export const ExtensionButton: React.FC<any> = ({
   ...rest
 }) => {
   return (
-    <StyledButton variant="outline" onClick={onClick} mb="small">
+    <StyledButton onClick={onClick} mb="small">
       <StyledLabel>{children}</StyledLabel>
     </StyledButton>
   )
 }
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(ButtonOutline)`
   text-align: center;
 `
 

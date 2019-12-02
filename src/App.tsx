@@ -3,7 +3,8 @@ import { SandboxFunctions } from "./components/SandboxFunctions"
 import { ApiFunctions } from "./components/ApiFunctions"
 import React, { useState } from "react"
 import { Switch, Route, Redirect } from "react-router-dom"
-import { ThemeProvider, theme, Box, styled } from "looker-lens"
+import { theme, Box, GlobalStyle } from "@looker/components"
+import styled, { ThemeProvider } from "styled-components"
 import { LensPlayground } from "./components/LensPlayground"
 import { ExtensionProvider } from "@looker/extension-sdk-react"
 
@@ -21,27 +22,30 @@ export const App: React.FC<AppProps> = ({ standalone }) => {
   const [pathname, setPathname] = useState("")
 
   return (
-    <ThemeProvider theme={theme}>
-      <ExtensionProvider onPathnameChange={setPathname}>
-        <Layout>
-          <Sidebar pathname={pathname} />
-          <Box>
-            <Switch>
-              <Route path={ROUTES.API_ROUTE}>
-                <ApiFunctions />
-              </Route>
-              <Route path={ROUTES.SANDBOX_ROUTE}>
-                <SandboxFunctions />
-              </Route>
-              <Route path={ROUTES.LENS_ROUTE}>
-                <LensPlayground />
-              </Route>
-              <Redirect to={ROUTES.API_ROUTE} />
-            </Switch>
-          </Box>
-        </Layout>
-      </ExtensionProvider>
-    </ThemeProvider>
+    <ExtensionProvider onPathnameChange={setPathname}>
+      <ThemeProvider theme={theme}>
+        <>
+          <GlobalStyle />
+          <Layout>
+            <Sidebar pathname={pathname} />
+            <Box>
+              <Switch>
+                <Route path={ROUTES.API_ROUTE}>
+                  <ApiFunctions />
+                </Route>
+                <Route path={ROUTES.SANDBOX_ROUTE}>
+                  <SandboxFunctions />
+                </Route>
+                <Route path={ROUTES.LENS_ROUTE}>
+                  <LensPlayground />
+                </Route>
+                <Redirect to={ROUTES.API_ROUTE} />
+              </Switch>
+            </Box>
+          </Layout>
+        </>
+      </ThemeProvider>
+    </ExtensionProvider>
   )
 }
 

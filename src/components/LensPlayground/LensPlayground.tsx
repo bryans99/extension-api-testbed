@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Heading, Card, CardContent, Text } from "looker-lens"
+import { Heading, Card, CardContent, Text } from "@looker/components"
 import { LensPlaygroundProps } from "./types"
 
 export const LensPlayground: React.FC<LensPlaygroundProps> = () => {
@@ -7,9 +7,7 @@ export const LensPlayground: React.FC<LensPlaygroundProps> = () => {
     <>
       <Card raised m="large">
         <CardContent>
-          <Heading fontWeight="semiBold" textTransform="caps">
-            Welcome to Lens
-          </Heading>
+          <Heading fontWeight="semiBold">Welcome to Lens</Heading>
           <Text>Looker's component library</Text>
         </CardContent>
       </Card>

@@ -1,16 +1,18 @@
 import React, { useContext } from "react"
-import { Heading, Box, styled } from "looker-lens"
+import { Heading, Box } from "@looker/components"
+import styled from "styled-components"
 import { ExtensionButton } from "../ExtensionButton"
 import { ApiFunctionsProps } from "./types"
 import {
   ExtensionContext,
   ExtensionContextData
 } from "@looker/extension-sdk-react"
+import { ExtensionHostApi } from "@looker/extension-sdk"
 
 export const ApiFunctions: React.FC<ApiFunctionsProps> = () => {
   const [messages, setMessages] = React.useState("")
   const extensionContext = useContext<ExtensionContextData>(ExtensionContext)
-  const extensionHost = extensionContext.extensionSDK
+  const extensionHost = extensionContext.extensionSDK as ExtensionHostApi
   const sdk = extensionContext.coreSDK
 
   const buttonClick = () => {

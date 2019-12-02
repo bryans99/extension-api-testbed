@@ -1,6 +1,6 @@
 import * as React from "react"
-import { ExtensionHostApi, connectExtensionHost } from "bryns-extension-api"
-import { Heading, Box, styled } from "looker-lens"
+import { Heading, Box } from "@looker/components"
+import styled from "styled-components"
 import { ExtensionButton } from "../ExtensionButton"
 
 export const SandboxFunctions = () => {
