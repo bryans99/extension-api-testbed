@@ -80,6 +80,42 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = () => {
     })
   }
 
+  const localStorageSet = () => {
+    extensionHost
+      .localStorageSetItem("testbed", new Date().toString())
+      .then(() => {
+        setMessages(messages + "\nSuccess")
+      })
+      .catch(error => {
+        setMessages(messages + "\n" + error)
+        console.error(error)
+      })
+  }
+
+  const localStorageGet = () => {
+    extensionHost
+      .localStorageGetItem("testbed")
+      .then(value => {
+        setMessages(messages + "\n" + (value || "null"))
+      })
+      .catch(error => {
+        setMessages(messages + "\n" + error)
+        console.error(error)
+      })
+  }
+
+  const localStorageRemove = () => {
+    extensionHost
+      .localStorageRemoveItem("testbed")
+      .then(() => {
+        setMessages(messages + "\nSuccess")
+      })
+      .catch(error => {
+        setMessages(messages + "\n" + error)
+        console.error(error)
+      })
+  }
+
   const inlineQueryClick = () => {
     sdk
       .run_inline_query({
@@ -156,6 +192,27 @@ export const ApiFunctions: React.FC<ApiFunctionsProps> = () => {
             onClick={inlineQueryClick}
           >
             Inline Query
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={localStorageSet}
+          >
+            Set local storage
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={localStorageGet}
+          >
+            Get local storage
+          </ExtensionButton>
+          <ExtensionButton
+            mt="small"
+            variant="outline"
+            onClick={localStorageRemove}
+          >
+            Remove local storage
           </ExtensionButton>
         </Box>
         <Box width="50%" pr="large">
